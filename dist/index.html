@@ -45,6 +45,8 @@
         --background-color: #ffffff;
         --primary-color: #000000;
         --secondary-color: rgb(84, 84, 84);
+
+        --success: #319337;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -126,7 +128,8 @@
       }
       input[type="submit"] {
         -webkit-border-radius: 0px;
-        background: #319337;
+        -webkit-appearance: none;
+        background: var(--success);
         font-weight: 500;
         display: flex;
         align-items: center;
@@ -134,8 +137,9 @@
         color: white;
         justify-content: center;
         border-radius: 4px;
+        cursor: pointer;
       }
-      .input-group {
+      #input-container {
         position: relative;
       }
       #suggestions {
@@ -160,6 +164,22 @@
       #suggestions > *:first-child {
         border-top: solid var(--primary-color) 2px;
       }
+
+      #share {
+        cursor: pointer;
+        background: var(--success);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: white;
+        justify-content: center;
+        border-radius: 4px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
     </style>
   </head>
   <body>
@@ -178,11 +198,12 @@
           <div class="answer"></div>
           <div class="answer"></div>
           <div class="answer"></div>
-          <div class="input-group">
+          <div id="input-container">
             <div id="suggestions"></div>
             <input type="text" id="answer" placeholder="Département" />
           </div>
-          <input type="submit" value="Deviner" />
+          <input id="submit" type="submit" value="Deviner" />
+          <button type="button" id="share" class="hidden">Partager</button>
         </form>
       </main>
     </div>
@@ -198,6 +219,9 @@
       const inputElement = document.getElementById("answer");
       const suggestionsElement = document.getElementById("suggestions");
       const formElement = document.getElementsByTagName("form")[0];
+      const inputContainerElement = document.getElementById("input-container");
+      const shareElement = document.getElementById("share");
+      const submitElement = document.getElementById("submit");
 
       // from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
       function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -284,6 +308,12 @@
         isReady = true;
       }
 
+      function end() {
+        inputContainerElement.classList.add("hidden");
+        submitElement.classList.add("hidden");
+        shareElement.className = "";
+      }
+
       function guess(e) {
         e.preventDefault();
         if (!isReady) {
@@ -316,12 +346,19 @@
           } (${roundedDistance}km ${getIconForDirection(angle)})`;
           if (answer === department.name) {
             alert("Vous avez gagné !");
+            end();
           } else {
             if (answers.length === 6) {
               alert("Vous avez perdu...");
+              end();
             }
           }
         }
+      }
+
+      async function share() {
+        await navigator.clipboard.writeText("https://www.departle.fr/");
+        alert("Résultat copié !");
       }
 
       function resetSuggestions() {
@@ -350,6 +387,7 @@
       inputElement.addEventListener("keyup", autocomplete);
       inputElement.addEventListener("click", autocomplete);
       formElement.addEventListener("submit", guess);
+      shareElement.addEventListener("click", share);
     </script>
   </body>
 </html>
