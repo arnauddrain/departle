@@ -1,16 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;700&display=swap"
+      rel="stylesheet"
+    />
     <meta charset="utf-8" />
     <title>Departle</title>
     <style type="text/css">
+      * {
+        font-family: "Roboto", sans-serif;
+        color: white;
+      }
+      h1 {
+        text-align: center;
+        text-transform: uppercase;
+      }
+      header {
+        border-bottom: 2px white solid;
+      }
       body {
-        background: grey;
+        background: rgb(153, 153, 153);
+      }
+      .container {
+        margin: auto;
+        max-width: 500px;
       }
       path {
         fill: white;
       }
+      .departement {
+        height: 200px;
+      }
+      svg {
+        height: 100%;
+        margin: auto;
+        display: block;
+      }
+      .answers {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .answers > * {
+        border-radius: 4px;
+        height: 32px;
+      }
+      .answer {
+        background: rgb(84, 84, 84);
+      }
+      input[type="text"] {
+        color: rgb(153, 153, 153);
+      }
+      input[type="submit"] {
+        background: red;
+      }
     </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Departle</h1>
+      </header>
+      <div class="departement">
+        <svg viewBox="0 0 667 578" xml:space="preserve">
+          <path id="departement"></path>
+        </svg>
+      </div>
+      <form class="answers">
+        <div class="answer"></div>
+        <div class="answer"></div>
+        <div class="answer"></div>
+        <div class="answer"></div>
+        <div class="answer"></div>
+        <div class="answer"></div>
+        <input type="text" id="" />
+        <input type="submit" value="Deviner" />
+      </form>
+    </div>
     <script>
       fetch("departements.json")
         .then((response) => response.json())
@@ -26,13 +95,14 @@
             .getElementById("center")
             .setAttribute("cy", departement.center.y);
         });
+
+      function guess(e) {
+        e.preventDefault();
+        console.log(e);
+      }
+
+      const form = document.getElementsByTagName("form")[0];
+      form.addEventListener("submit", guess);
     </script>
-  </head>
-  <body>
-    <h1>Departle</h1>
-    <svg viewBox="0 0 667 578" xml:space="preserve">
-      <path id="departement"></path>
-      <circle id="center" cx="70.9" cy="527.52" r="2" fill="red" />
-    </svg>
   </body>
 </html>
