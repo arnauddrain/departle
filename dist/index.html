@@ -223,6 +223,35 @@
       const shareElement = document.getElementById("share");
       const submitElement = document.getElementById("submit");
 
+      // from https://www.delftstack.com/howto/javascript/javascript-random-seed-to-generate-random/
+      function MurmurHash3(string) {
+        let i, hash;
+        for (i = 0, hash = 1779033703 ^ string.length; i < string.length; i++) {
+          let bitwise_xor_from_character = hash ^ string.charCodeAt(i);
+          hash = Math.imul(bitwise_xor_from_character, 3432918353);
+          hash = (hash << 13) | (hash >>> 19);
+        }
+        return () => {
+          // Return the hash that you can use as a seed
+          hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
+          hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
+          return (hash ^= hash >>> 16) >>> 0;
+        };
+      }
+
+      function JenkinsSimpleFast32(seed_1, seed_2, seed_3, seed_4) {
+        seed_1 |= 0;
+        seed_2 |= 0;
+        seed_3 |= 0;
+        seed_4 |= 0;
+        let t = (seed_1 - ((seed_2 << 27) | (seed_2 >>> 5))) | 0;
+        seed_1 = seed_2 ^ ((seed_3 << 17) | (seed_3 >>> 15));
+        seed_2 = (seed_3 + seed_4) | 0;
+        seed_3 = (seed_4 + t) | 0;
+        seed_4 = (seed_1 + t) | 0;
+        return (seed_4 >>> 0) / 4294967296;
+      }
+
       // from https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
       function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
         var R = 6371; // Radius of the earth in km
@@ -297,8 +326,18 @@
           a.name.localeCompare(b.name)
         );
         departmentNames = departments.map((d) => d.name);
-        department =
-          departments[Math.round(Math.random() * departments.length)];
+
+        const date = new Date();
+        const generate_seed = MurmurHash3(
+          date.getDate().toString() +
+            date.getMonth().toString() +
+            date.getFullYear().toString()
+        );
+        const index = Math.round(
+          JenkinsSimpleFast32(generate_seed(), generate_seed()) *
+            departments.length
+        );
+        department = departments[index];
         document
           .getElementsByTagName("svg")[0]
           .setAttribute("viewBox", department.viewBox);
