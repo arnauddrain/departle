@@ -84,7 +84,8 @@
       fetch("departements.json")
         .then((response) => response.json())
         .then((departements) => {
-          const departement = departements[20];
+          const departement =
+            departements[Math.round(Math.random() * departements.length)];
           document
             .getElementById("departement")
             .setAttribute("d", departement.originalPath);
