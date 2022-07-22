@@ -137,7 +137,6 @@
         departmentNames = departments.map((d) => d.name);
         department =
           departments[Math.round(Math.random() * departments.length)];
-        console.log(department);
         document
           .getElementsByTagName("svg")[0]
           .setAttribute("viewBox", department.viewBox);
