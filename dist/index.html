@@ -4,7 +4,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;500;700&display=swap"
       rel="stylesheet"
     />
     <meta charset="utf-8" />
@@ -13,6 +13,9 @@
       * {
         font-family: "Roboto", sans-serif;
         color: white;
+        border: none;
+        box-sizing: border-box;
+        font-weight: 100;
       }
       h1 {
         text-align: center;
@@ -32,7 +35,7 @@
         fill: white;
       }
       .departement {
-        height: 200px;
+        height: 180px;
       }
       svg {
         height: 100%;
@@ -52,10 +55,38 @@
         background: rgb(84, 84, 84);
       }
       input[type="text"] {
-        color: rgb(153, 153, 153);
+        height: 32px;
+        border-radius: 4px;
+        color: black;
+        padding: 5px 10px;
       }
       input[type="submit"] {
         background: red;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      #suggestions {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 4px;
+        bottom: calc(32px + 4px);
+        max-height: 200px;
+        overflow: auto;
+      }
+      #suggestions > * {
+        display: block;
+        background: rgb(153, 153, 153);
+        height: 32px;
+        border-radius: 4px;
+        padding: 5px 10px;
+        border: solid white 2px;
+        font-weight: 500;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -76,33 +107,85 @@
         <div class="answer"></div>
         <div class="answer"></div>
         <div class="answer"></div>
-        <input type="text" id="" />
+        <div class="input-group">
+          <div id="suggestions"></div>
+          <input type="text" id="answer" placeholder="Département" />
+        </div>
         <input type="submit" value="Deviner" />
       </form>
     </div>
     <script>
-      fetch("departements.json")
-        .then((response) => response.json())
-        .then((departements) => {
-          const departement =
-            departements[Math.round(Math.random() * departements.length)];
-          document
-            .getElementById("departement")
-            .setAttribute("d", departement.originalPath);
-          document
-            .getElementById("center")
-            .setAttribute("cx", departement.center.x);
-          document
-            .getElementById("center")
-            .setAttribute("cy", departement.center.y);
-        });
+      let isReady = false;
+      let answers = [];
+      let departements = [];
+      let departementNames = [];
+      let departement = null;
+
+      const input = document.getElementById("answer");
+      const suggestions = document.getElementById("suggestions");
+      const form = document.getElementsByTagName("form")[0];
+
+      async function fetchData() {
+        const response = await fetch("departements.json");
+        departements = (await response.json()).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        departementNames = departements.map((d) => d.name);
+        departement =
+          departements[Math.round(Math.random() * departements.length)];
+        document
+          .getElementById("departement")
+          .setAttribute("d", departement.originalPath);
+        isReady = true;
+      }
 
       function guess(e) {
         e.preventDefault();
-        console.log(e);
+        if (!isReady) {
+          return;
+        }
+        const answer = input.value;
+        input.value = "";
+        if (!departementNames.includes(answer)) {
+          return alert("Département inconnu !");
+        } else {
+          answers.push(answer);
+          document.getElementsByClassName("answer")[
+            answers.length - 1
+          ].innerHTML = answer;
+          if (answer === departement.name) {
+            alert("Vous avez gagné !");
+          } else if (answers.length === 6) {
+            alert("Vous avez perdu...");
+          }
+        }
       }
 
-      const form = document.getElementsByTagName("form")[0];
+      function resetSuggestions() {
+        suggestions.innerHTML = "";
+      }
+
+      function autocomplete() {
+        resetSuggestions();
+
+        const answerLowerCase = input.value.toLowerCase();
+        const potentialDepartementNames = departementNames
+          .filter((d) => d.toLowerCase().includes(answerLowerCase))
+          .forEach((d) => {
+            const element = document.createElement("div");
+            element.appendChild(document.createTextNode(d));
+            element.addEventListener("click", () => (input.value = d));
+            suggestions.appendChild(element);
+          });
+      }
+
+      fetchData();
+
+      document.addEventListener("click", (e) => {
+        e.target !== input && resetSuggestions();
+      });
+      input.addEventListener("keyup", autocomplete);
+      input.addEventListener("click", autocomplete);
       form.addEventListener("submit", guess);
     </script>
   </body>
