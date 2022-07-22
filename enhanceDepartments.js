@@ -1,10 +1,10 @@
 const fs = require("fs");
 
-const departements = JSON.parse(fs.readFileSync("./dist/departements.json"));
+const departments = JSON.parse(fs.readFileSync("./dist/departments.json"));
 
-const enhancedDepartements = departements.map((departement) => {
-  const regex = /([a-zA-Z])(-{0,1}[\d|.]+),{0,1}(-{0,1}[\d|.]+)/g;
-  const points = [...departement.originalPath.matchAll(regex)]
+const enhancedDepartments = departments.map((department) => {
+  const regex = /([a-zA-Z])(-?[\d|.]+),?(-?[\d|.]+)/g;
+  const points = [...department.originalPath.matchAll(regex)]
     .map((match) => ({
       command: match[1],
       x: Number(match[2], 0),
@@ -23,12 +23,12 @@ const enhancedDepartements = departements.map((departement) => {
     y: points.reduce((acc, point) => point.y + acc, 0) / points.length,
   };
   return {
-    ...departement,
+    ...department,
     center: avg,
   };
 });
 
 fs.writeFileSync(
-  "./dist/departements.json",
-  JSON.stringify(enhancedDepartements)
+  "./dist/departments.json",
+  JSON.stringify(enhancedDepartments)
 );

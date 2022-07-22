@@ -34,7 +34,7 @@
       path {
         fill: white;
       }
-      .departement {
+      .department {
         height: 180px;
       }
       svg {
@@ -95,9 +95,9 @@
       <header>
         <h1>Departle</h1>
       </header>
-      <div class="departement">
+      <div class="department">
         <svg viewBox="0 0 667 578" xml:space="preserve">
-          <path id="departement"></path>
+          <path id="department"></path>
         </svg>
       </div>
       <form class="answers">
@@ -115,27 +115,29 @@
       </form>
     </div>
     <script>
+      "use strict";
+
       let isReady = false;
       let answers = [];
-      let departements = [];
-      let departementNames = [];
-      let departement = null;
+      let departments = [];
+      let departmentNames = [];
+      let department = null;
 
-      const input = document.getElementById("answer");
-      const suggestions = document.getElementById("suggestions");
-      const form = document.getElementsByTagName("form")[0];
+      const inputElement = document.getElementById("answer");
+      const suggestionsElement = document.getElementById("suggestions");
+      const formElement = document.getElementsByTagName("form")[0];
 
       async function fetchData() {
-        const response = await fetch("departements.json");
-        departements = (await response.json()).sort((a, b) =>
+        const response = await fetch("departments.json");
+        departments = (await response.json()).sort((a, b) =>
           a.name.localeCompare(b.name)
         );
-        departementNames = departements.map((d) => d.name);
-        departement =
-          departements[Math.round(Math.random() * departements.length)];
+        departmentNames = departments.map((d) => d.name);
+        department =
+          departments[Math.round(Math.random() * departments.length)];
         document
-          .getElementById("departement")
-          .setAttribute("d", departement.originalPath);
+          .getElementById("department")
+          .setAttribute("d", department.originalPath);
         isReady = true;
       }
 
@@ -144,49 +146,51 @@
         if (!isReady) {
           return;
         }
-        const answer = input.value;
-        input.value = "";
-        if (!departementNames.includes(answer)) {
+        const answer = inputElement.value;
+        inputElement.value = "";
+        if (!departmentNames.includes(answer)) {
           return alert("Département inconnu !");
         } else {
           answers.push(answer);
           document.getElementsByClassName("answer")[
             answers.length - 1
           ].innerHTML = answer;
-          if (answer === departement.name) {
+          if (answer === department.name) {
             alert("Vous avez gagné !");
-          } else if (answers.length === 6) {
-            alert("Vous avez perdu...");
+          } else {
+            if (answers.length === 6) {
+              alert("Vous avez perdu...");
+            }
           }
         }
       }
 
       function resetSuggestions() {
-        suggestions.innerHTML = "";
+        suggestionsElement.innerHTML = "";
       }
 
       function autocomplete() {
         resetSuggestions();
 
-        const answerLowerCase = input.value.toLowerCase();
-        const potentialDepartementNames = departementNames
+        const answerLowerCase = inputElement.value.toLowerCase();
+        departmentNames
           .filter((d) => d.toLowerCase().includes(answerLowerCase))
           .forEach((d) => {
             const element = document.createElement("div");
             element.appendChild(document.createTextNode(d));
-            element.addEventListener("click", () => (input.value = d));
-            suggestions.appendChild(element);
+            element.addEventListener("click", () => (inputElement.value = d));
+            suggestionsElement.appendChild(element);
           });
       }
 
       fetchData();
 
       document.addEventListener("click", (e) => {
-        e.target !== input && resetSuggestions();
+        e.target !== inputElement && resetSuggestions();
       });
-      input.addEventListener("keyup", autocomplete);
-      input.addEventListener("click", autocomplete);
-      form.addEventListener("submit", guess);
+      inputElement.addEventListener("keyup", autocomplete);
+      inputElement.addEventListener("click", autocomplete);
+      formElement.addEventListener("submit", guess);
     </script>
   </body>
 </html>
