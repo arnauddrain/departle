@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const departements = JSON.parse(fs.readFileSync("./departements.json"));
+const departements = JSON.parse(fs.readFileSync("./dist/departements.json"));
 
 const enhancedDepartements = departements.map((departement) => {
   const regex = /([a-zA-Z])(-{0,1}[\d|.]+),{0,1}(-{0,1}[\d|.]+)/g;
@@ -28,4 +28,7 @@ const enhancedDepartements = departements.map((departement) => {
   };
 });
 
-fs.writeFileSync("./departements.json", JSON.stringify(enhancedDepartements));
+fs.writeFileSync(
+  "./dist/departements.json",
+  JSON.stringify(enhancedDepartements)
+);
