@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Departle</title>
+    <style type="text/css">
+      body {
+        background: grey;
+      }
+      path {
+        fill: white;
+      }
+    </style>
+    <script>
+      fetch("departements.json")
+        .then((response) => response.json())
+        .then((departements) => {
+          console.log(departements);
+          const svg = document
+            .getElementById("departement")
+            .setAttribute("d", departements[0].path);
+        });
+    </script>
+  </head>
+  <body>
+    <h1>Departle</h1>
+    <svg viewBox="0 0 667 578" xml:space="preserve">
+      <path id="departement"></path>
+    </svg>
+  </body>
+</html>
