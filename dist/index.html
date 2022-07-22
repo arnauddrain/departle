@@ -41,38 +41,61 @@
     </script>
 
     <style type="text/css">
+      :root {
+        --background-color: #ffffff;
+        --primary-color: #000000;
+        --secondary-color: rgb(84, 84, 84);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: #121212;
+          --primary-color: #ffffff;
+          --secondary-color: #121212;
+        }
+      }
+
       * {
         font-family: "Roboto", sans-serif;
-        color: white;
+        color: var(--primary-color);
         border: none;
         box-sizing: border-box;
         font-weight: 100;
+        margin: 0;
+        padding: 0;
+        outline: none;
       }
+
+      body {
+        background: var(--background-color);
+      }
+
       h1 {
         text-align: center;
         text-transform: uppercase;
+        font-weight: 500;
+        margin: 8px 0;
       }
+
       header {
-        border-bottom: 2px white solid;
+        border-bottom: 2px var(--primary-color) solid;
       }
-      body {
-        background: rgb(153, 153, 153);
-      }
+
       .container {
         margin: auto;
         max-width: 500px;
       }
+
       path {
-        fill: white;
+        fill: var(--primary-color);
       }
-      .department {
-        height: 180px;
-      }
+
       svg {
-        height: 100%;
-        margin: auto;
+        height: 180px;
+        margin: 16px auto;
         display: block;
       }
+
       .answers {
         display: flex;
         flex-direction: column;
@@ -84,40 +107,54 @@
       }
       .answer {
         background: rgb(84, 84, 84);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0px 16px;
       }
       input[type="text"] {
         height: 32px;
         border-radius: 4px;
-        color: black;
-        padding: 5px 10px;
+        color: var(--secondary-color);
+        display: flex;
+        align-items: center;
+        padding: 0px 16px;
+        width: 100%;
+        border: 2px var(--primary-color) solid;
       }
       input[type="submit"] {
         background: red;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: white;
+        justify-content: center;
       }
       .input-group {
-        display: flex;
-        flex-direction: column;
         position: relative;
       }
       #suggestions {
         position: absolute;
-        display: flex;
-        flex-direction: column;
         width: 100%;
-        gap: 4px;
         bottom: calc(32px + 4px);
         max-height: 200px;
         overflow: auto;
       }
       #suggestions > * {
+        background-color: var(--background-color);
         display: block;
-        background: rgb(153, 153, 153);
         height: 32px;
-        border-radius: 4px;
-        padding: 5px 10px;
-        border: solid white 2px;
+        display: flex;
+        align-items: center;
+        padding: 0px 16px;
+        border: solid var(--primary-color) 2px;
+        border-top: none;
         font-weight: 500;
         cursor: pointer;
+      }
+      #suggestions > *:first-child {
+        border-top: solid var(--primary-color) 2px;
       }
     </style>
   </head>
@@ -126,24 +163,24 @@
       <header>
         <h1>Departle</h1>
       </header>
-      <div class="department">
+      <main>
         <svg viewBox="0 0 667 578" xml:space="preserve">
           <path id="department"></path>
         </svg>
-      </div>
-      <form class="answers" autocomplete="off">
-        <div class="answer"></div>
-        <div class="answer"></div>
-        <div class="answer"></div>
-        <div class="answer"></div>
-        <div class="answer"></div>
-        <div class="answer"></div>
-        <div class="input-group">
-          <div id="suggestions"></div>
-          <input type="text" id="answer" placeholder="Département" />
-        </div>
-        <input type="submit" value="Deviner" />
-      </form>
+        <form class="answers" autocomplete="off">
+          <div class="answer"></div>
+          <div class="answer"></div>
+          <div class="answer"></div>
+          <div class="answer"></div>
+          <div class="answer"></div>
+          <div class="answer"></div>
+          <div class="input-group">
+            <div id="suggestions"></div>
+            <input type="text" id="answer" placeholder="Département" />
+          </div>
+          <input type="submit" value="Deviner" />
+        </form>
+      </main>
     </div>
     <script>
       "use strict";
