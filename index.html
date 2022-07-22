@@ -15,10 +15,16 @@
       fetch("departements.json")
         .then((response) => response.json())
         .then((departements) => {
-          console.log(departements);
-          const svg = document
+          const departement = departements[20];
+          document
             .getElementById("departement")
-            .setAttribute("d", departements[0].path);
+            .setAttribute("d", departement.originalPath);
+          document
+            .getElementById("center")
+            .setAttribute("cx", departement.center.x);
+          document
+            .getElementById("center")
+            .setAttribute("cy", departement.center.y);
         });
     </script>
   </head>
@@ -26,6 +32,7 @@
     <h1>Departle</h1>
     <svg viewBox="0 0 667 578" xml:space="preserve">
       <path id="departement"></path>
+      <circle id="center" cx="70.9" cy="527.52" r="2" fill="red" />
     </svg>
   </body>
 </html>
