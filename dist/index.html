@@ -152,6 +152,54 @@
         return deg * (Math.PI / 180);
       }
 
+      function rad2deg(rad) {
+        return rad / (Math.PI / 180);
+      }
+
+      // from https://stackoverflow.com/questions/3932502/calculate-angle-between-two-latitude-longitude-points
+      function angleFromCoordinate(lat1, long1, lat2, long2) {
+        const lat1r = deg2rad(lat1);
+        const long1r = deg2rad(long1);
+        const lat2r = deg2rad(lat2);
+        const long2r = deg2rad(long2);
+        const dLon = long2r - long1r;
+
+        const y = Math.sin(dLon) * Math.cos(lat2r);
+        const x =
+          Math.cos(lat1r) * Math.sin(lat2r) -
+          Math.sin(lat1r) * Math.cos(lat2r) * Math.cos(dLon);
+
+        let brng = Math.atan2(y, x);
+        brng = rad2deg(brng);
+        brng = (brng + 360) % 360;
+
+        return brng;
+      }
+
+      function getIconForDirection(angle) {
+        const quarterOfCircle = 360 / 8;
+        if (
+          angle < quarterOfCircle / 2 ||
+          angle > 360 - quarterOfCircle * 0.5
+        ) {
+          return "⬆";
+        } else if (angle > 360 - quarterOfCircle * 1.5) {
+          return "↖";
+        } else if (angle > 360 - quarterOfCircle * 2.5) {
+          return "⬅";
+        } else if (angle > 360 - quarterOfCircle * 3.5) {
+          return "↙";
+        } else if (angle > 360 - quarterOfCircle * 4.5) {
+          return "⬇";
+        } else if (angle > 360 - quarterOfCircle * 5.5) {
+          return "↘";
+        } else if (angle > 360 - quarterOfCircle * 6.5) {
+          return "➡";
+        } else if (angle > 360 - quarterOfCircle * 7.5) {
+          return "↗";
+        }
+      }
+
       async function fetchData() {
         const response = await fetch("departments.json");
         departments = (await response.json()).sort((a, b) =>
@@ -186,11 +234,19 @@
             department.coordinates.lat,
             department.coordinates.long
           );
+          const angle = angleFromCoordinate(
+            guessedDepartment.coordinates.lat,
+            guessedDepartment.coordinates.long,
+            department.coordinates.lat,
+            department.coordinates.long
+          );
           const roundedDistance = Math.round(distance * 100) / 100;
           answers.push(guessedDepartment);
           document.getElementsByClassName("answer")[
             answers.length - 1
-          ].innerHTML = `${guessedDepartment.name} (${roundedDistance}km)`;
+          ].innerHTML = `${
+            guessedDepartment.name
+          } (${roundedDistance}km ${getIconForDirection(angle)})`;
           if (answer === department.name) {
             alert("Vous avez gagné !");
           } else {
