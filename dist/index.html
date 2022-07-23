@@ -343,6 +343,15 @@
           .getElementsByTagName("path")[0]
           .setAttribute("d", department.path);
         isReady = true;
+        const storedIndex = localStorage.getItem("index");
+        if (storedIndex == index) {
+          answers = JSON.parse(localStorage.getItem("answers"));
+          answers.forEach((answer, i) => writeAnswer(answer, i));
+          checkSituation();
+        } else {
+          localStorage.setItem("index", index);
+          localStorage.setItem("answers", JSON.stringify([]));
+        }
       }
 
       function end() {
@@ -351,17 +360,43 @@
         shareElement.className = "";
       }
 
+      function writeAnswer(answer, i) {
+        const roundedDistance = Math.round(answer.distance * 100) / 100;
+        let text = answer.department.name;
+        if (roundedDistance) {
+          text += ` (${roundedDistance}km ${getIconForDirection(
+            answer.angle
+          )})`;
+        }
+        document.getElementsByClassName("answer")[i].innerHTML = text;
+      }
+
+      function checkSituation() {
+        const answer = answers[answers.length - 1];
+        if (answer.department.name === department.name) {
+          end();
+          alert("Vous avez gagné !");
+        } else {
+          if (answers.length === 6) {
+            end();
+            alert("Vous avez perdu, la réponse était " + department.name);
+          }
+        }
+      }
+
       function guess(e) {
         e.preventDefault();
         if (!isReady) {
           return;
         }
-        const answer = inputElement.value;
+        const inputValue = inputElement.value;
         inputElement.value = "";
-        if (!departmentNames.includes(answer)) {
+        if (!departmentNames.includes(inputValue)) {
           return alert("Département inconnu !");
         } else {
-          const guessedDepartment = departments.find((d) => d.name === answer);
+          const guessedDepartment = departments.find(
+            (d) => d.name === inputValue
+          );
           const distance = getDistanceFromLatLonInKm(
             guessedDepartment.coordinates.lat,
             guessedDepartment.coordinates.long,
@@ -374,22 +409,15 @@
             department.coordinates.lat,
             department.coordinates.long
           );
-          const roundedDistance = Math.round(distance * 100) / 100;
-          answers.push(guessedDepartment);
-          document.getElementsByClassName("answer")[
-            answers.length - 1
-          ].innerHTML = `${
-            guessedDepartment.name
-          } (${roundedDistance}km ${getIconForDirection(angle)})`;
-          if (answer === department.name) {
-            alert("Vous avez gagné !");
-            end();
-          } else {
-            if (answers.length === 6) {
-              alert("Vous avez perdu...");
-              end();
-            }
-          }
+          const answer = {
+            department: guessedDepartment,
+            distance: distance,
+            angle: angle,
+          };
+          answers.push(answer);
+          localStorage.setItem("answers", JSON.stringify(answers));
+          writeAnswer(answer, answers.length - 1);
+          checkSituation();
         }
       }
 
