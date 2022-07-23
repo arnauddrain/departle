@@ -213,6 +213,7 @@
       let departments = [];
       let departmentNames = [];
       let department = null;
+      let dayIndex = 0;
 
       const inputElement = document.getElementById("answer");
       const suggestionsElement = document.getElementById("suggestions");
@@ -325,7 +326,11 @@
         );
         departmentNames = departments.map((d) => d.name);
 
+        const firstDay = new Date("07/22/2022");
         const date = new Date();
+        dayIndex = Math.ceil(
+          (date.getTime() - firstDay.getTime()) / (1000 * 3600 * 24)
+        );
         const generate_seed = MurmurHash3(
           date.getDate().toString() +
             date.getMonth().toString() +
@@ -343,13 +348,13 @@
           .getElementsByTagName("path")[0]
           .setAttribute("d", department.path);
         isReady = true;
-        const storedIndex = localStorage.getItem("index");
-        if (storedIndex == index) {
+        const storedDayIndex = localStorage.getItem("dayIndex");
+        if (storedDayIndex == dayIndex) {
           answers = JSON.parse(localStorage.getItem("answers"));
           answers.forEach((answer, i) => writeAnswer(answer, i));
           checkSituation();
         } else {
-          localStorage.setItem("index", index);
+          localStorage.setItem("dayIndex", dayIndex);
           localStorage.setItem("answers", JSON.stringify([]));
         }
       }
@@ -371,9 +376,12 @@
         document.getElementsByClassName("answer")[i].innerHTML = text;
       }
 
+      function didWin() {
+        return answers[answers.length - 1]?.department.name === department.name;
+      }
+
       function checkSituation() {
-        const answer = answers[answers.length - 1];
-        if (answer?.department.name === department.name) {
+        if (didWin()) {
           end();
           alert("Vous avez gagné !");
         } else {
@@ -421,8 +429,34 @@
         }
       }
 
+      function generateColors(distance) {
+        let text = "";
+        for (let i = 5; i > 0; i--) {
+          if (distance < i * 2 * 100 - 100) {
+            text += "🟩";
+          } else if (distance < i * 2 * 100) {
+            text += "🟨";
+          } else {
+            text += "⬛";
+          }
+        }
+        return text;
+      }
+
       async function share() {
-        await navigator.clipboard.writeText("https://www.departle.fr/");
+        let text = `#Departle #${dayIndex} ${
+          didWin() ? answers.length : "X"
+        }/6\n`;
+        answers.forEach((answer) => {
+          text +=
+            generateColors(answer.distance) +
+            (answer.distance ? getIconForDirection(answer.angle) : "🎉") +
+            "\n";
+        });
+        text += "https://www.departle.fr/";
+
+        await navigator.clipboard.writeText(text);
+
         alert("Résultat copié !");
       }
 
