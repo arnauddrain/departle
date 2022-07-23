@@ -373,7 +373,7 @@
 
       function checkSituation() {
         const answer = answers[answers.length - 1];
-        if (answer.department.name === department.name) {
+        if (answer?.department.name === department.name) {
           end();
           alert("Vous avez gagné !");
         } else {
