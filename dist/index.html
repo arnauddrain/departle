@@ -52,6 +52,11 @@
           --primary-color: #ffffff;
           --secondary-color: #121212;
         }
+
+        .icon {
+          filter: invert(96%) sepia(100%) saturate(2%) hue-rotate(124deg)
+            brightness(107%) contrast(101%);
+        }
       }
 
       * {
@@ -72,6 +77,7 @@
       }
 
       h1 {
+        font-size: 24px;
         text-align: center;
         text-transform: uppercase;
         font-weight: 500;
@@ -79,7 +85,15 @@
       }
 
       header {
+        display: flex;
+        justify-content: space-between;
         border-bottom: 2px var(--primary-color) solid;
+        align-items: center;
+      }
+
+      .icon {
+        width: 24px;
+        height: 24px;
       }
 
       .container {
@@ -92,7 +106,7 @@
         fill: var(--primary-color);
       }
 
-      svg {
+      #department-svg {
         height: 180px;
         margin: 16px auto;
         display: block;
@@ -183,10 +197,20 @@
   <body>
     <div class="container">
       <header>
+        <div class="icon"></div>
         <h1>Departle</h1>
+        <a href="https://github.com/arnauddrain/departle" target="_blank">
+          <img
+            width="24px"
+            height="24px"
+            alt="github"
+            class="icon"
+            src="github.svg"
+          />
+        </a>
       </header>
       <main>
-        <svg viewBox="0 0 667 578" xml:space="preserve">
+        <svg id="department-svg" viewBox="0 0 667 578" xml:space="preserve">
           <path id="department"></path>
         </svg>
         <form class="answers" autocomplete="off">
