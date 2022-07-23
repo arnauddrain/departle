@@ -483,9 +483,13 @@
         });
         text += "https://www.departle.fr/";
 
-        await navigator.clipboard.writeText(text);
-
-        alert("Résultat copié !");
+        if (navigator.share) {
+          await navigator.share({ text });
+        } else {
+          // Fallback
+          await navigator.clipboard.writeText(text);
+          alert("Résultat copié !");
+        }
       }
 
       function resetSuggestions() {
