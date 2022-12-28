@@ -496,16 +496,28 @@
         suggestionsElement.innerHTML = "";
       }
 
+      function normalizeString(str) {
+        return str
+          .toLowerCase()
+          .replace(new RegExp(/[àáâãäå]/g), "a")
+          .replace(new RegExp(/[èéêë]/g), "e")
+          .replace(new RegExp(/[òóôõö]/g), "o")
+          .replace(new RegExp(/[ùúûü]/g), "u");
+      }
+
       function autocomplete() {
         resetSuggestions();
 
-        const answerLowerCase = inputElement.value.toLowerCase();
-        departmentNames
-          .filter((d) => d.toLowerCase().includes(answerLowerCase))
+        const answerMatcher = normalizeString(inputElement.value);
+        departments
+          .filter((d) => d.matcher.includes(answerMatcher))
           .forEach((d) => {
             const element = document.createElement("div");
-            element.appendChild(document.createTextNode(d));
-            element.addEventListener("click", () => (inputElement.value = d));
+            element.appendChild(document.createTextNode(d.name));
+            element.addEventListener(
+              "click",
+              () => (inputElement.value = d.name)
+            );
             suggestionsElement.appendChild(element);
           });
       }
