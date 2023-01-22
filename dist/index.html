@@ -350,6 +350,44 @@
         }
       }
 
+      /*
+       ** Generating every indexes since the beginning of the day based on the dates
+       ** To improve the game, the indexes should not have appeared in the last 30 days
+       */
+      function getRandForTodayAndCalculateDayIndex() {
+        const today = new Date();
+        // The game started on July 22th
+        const currentDay = new Date("07/22/2022");
+        const indexes = [];
+        while (today.getTime() > currentDay.getTime()) {
+          let variator = 0;
+          let newIndex = -1;
+          const oldIndexes = indexes.slice(-30);
+          while (
+            newIndex === -1 ||
+            // I added this feature on the 185th day, so I need to get the previous days without the "not repeated" feature
+            (dayIndex > 185 && oldIndexes.includes(newIndex))
+          ) {
+            console.log(variator);
+            const generate_seed = MurmurHash3(
+              currentDay.getDate().toString() +
+                currentDay.getMonth().toString() +
+                currentDay.getFullYear().toString() +
+                (dayIndex > 185 ? variator.toString() : "")
+            );
+            newIndex = Math.floor(
+              JenkinsSimpleFast32(generate_seed(), generate_seed()) *
+                departments.length
+            );
+            variator++;
+          }
+          indexes.push(newIndex);
+          currentDay.setDate(currentDay.getDate() + 1);
+          dayIndex++;
+        }
+        return indexes[indexes.length - 1];
+      }
+
       async function fetchData() {
         const response = await fetch("departments.json");
         departments = (await response.json()).sort((a, b) =>
@@ -357,20 +395,9 @@
         );
         departmentNames = departments.map((d) => d.name);
 
-        const firstDay = new Date("07/22/2022");
         const date = new Date();
-        dayIndex = Math.ceil(
-          (date.getTime() - firstDay.getTime()) / (1000 * 3600 * 24)
-        );
-        const generate_seed = MurmurHash3(
-          date.getDate().toString() +
-            date.getMonth().toString() +
-            date.getFullYear().toString()
-        );
-        const index = Math.round(
-          JenkinsSimpleFast32(generate_seed(), generate_seed()) *
-            departments.length
-        );
+
+        const index = getRandForTodayAndCalculateDayIndex();
         department = departments[index];
         document
           .getElementsByTagName("svg")[0]
